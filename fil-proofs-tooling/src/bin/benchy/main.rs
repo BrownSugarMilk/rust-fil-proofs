@@ -285,6 +285,13 @@ fn main() -> Result<()> {
                 .default_value("true")
                 .help("Validate proofs if specified")
                 .takes_value(false),
+        )
+        .arg(
+            Arg::new("fresh-tree-per-proof")
+                .long("fresh-tree-per-proof")
+                .required(false)
+                .help("Build a new merkle tree (sector) before each proof instead of reusing one tree")
+                .takes_value(false),
         );
 
     let matches = Command::new("benchy")
@@ -379,7 +386,12 @@ fn main() -> Result<()> {
             let size = Byte::from_str(m.value_of_t::<String>("size")?)?.get_bytes() as usize;
 
             let proofs = m.value_of_t::<usize>("proofs")?;
-            merkleproofs::run(size, proofs, m.is_present("validate"))?;
+            merkleproofs::run(
+                size,
+                proofs,
+                m.is_present("validate"),
+                m.is_present("fresh-tree-per-proof"),
+            )?;
         }
         Some(("porep", m)) => {
             let preserve_cache = m.is_present("preserve-cache");
